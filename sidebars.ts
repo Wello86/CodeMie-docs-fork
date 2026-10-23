@@ -345,6 +345,16 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'category',
+          label: 'Standalone',
+          link: {
+            type: 'doc',
+            id: 'user-guide/standalone/index',
+          },
+          collapsed: true,
+          items: ['user-guide/standalone/run-guide'],
+        },
+        {
+          type: 'category',
           label: 'Analytics',
           link: {
             type: 'doc',
@@ -444,7 +454,18 @@ const sidebars: SidebarsConfig = {
               },
               collapsed: true,
               items: [
-                'admin/deployment/prerequisites/prerequisites-kubernetes',
+                {
+                  type: 'category',
+                  label: 'Kubernetes',
+                  link: {
+                    type: 'doc',
+                    id: 'admin/deployment/prerequisites/prerequisites-kubernetes',
+                  },
+                  collapsed: true,
+                  items: [
+                    'admin/deployment/prerequisites/kubernetes/aws-iam-roles-and-permissions',
+                  ],
+                },
                 'admin/deployment/prerequisites/prerequisites-on-vm',
               ],
             },

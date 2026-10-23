@@ -245,12 +245,17 @@ Primary relational database for structured data and transactional operations.
 
 Document store for full-text search, analytics, and unstructured data.
 
-| Parameter                     | Type    | Default                   | Description                                                                                                                                                                          |
-| ----------------------------- | ------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ELASTIC_URL`                 | string  | `"http://localhost:9200"` | Elasticsearch cluster endpoint URL                                                                                                                                                   |
-| `ELASTIC_PASSWORD`            | string  | `""`                      | Password for `elastic` user or configured username                                                                                                                                   |
-| `ELASTIC_USERNAME`            | string  | `""`                      | Username for Elasticsearch authentication                                                                                                                                            |
-| `ELASTIC_DATASOURCE_REPLICAS` | integer | `1`                       | Number of replica shards for datasource indexes; set to `0` to have only the primary shard for each indexed datasource, reducing total shard usage on clusters with limited capacity |
+| Parameter                     | Type                             | Default                   | Description                                                                                                                                                                                                                                                                                                       |
+| ----------------------------- | -------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ELASTIC_URL`                 | string                           | `"http://localhost:9200"` | Elasticsearch cluster endpoint URL                                                                                                                                                                                                                                                                                |
+| `ELASTIC_PASSWORD`            | string                           | `""`                      | Password for `elastic` user or configured username                                                                                                                                                                                                                                                                |
+| `ELASTIC_USERNAME`            | string                           | `""`                      | Username for Elasticsearch authentication                                                                                                                                                                                                                                                                         |
+| `ELASTIC_DATASOURCE_REPLICAS` | integer                          | `1`                       | Number of replica shards for datasource indexes; set to `0` to have only the primary shard for each indexed datasource, reducing total shard usage on clusters with limited capacity                                                                                                                              |
+| `RETRIEVAL_BACKEND`           | string (`elasticsearch`, `none`) | `"elasticsearch"`         | Selects the retrieval backend. Set to `none` to run without Elasticsearch — Knowledge Bases, Data Sources, and code indexing are disabled; the admin log lookup endpoint is unaffected by this setting but relies on the same Elasticsearch connection, so also set `ADMIN_LOG_LOOKUP_ENABLED=false` in that case |
+
+:::info Standalone deployments
+The [CodeMie Standalone](../../../user-guide/standalone/index.md) image sets `RETRIEVAL_BACKEND=none` by default, since it does not include an Elasticsearch container.
+:::
 
 #### Elasticsearch Indexes
 
@@ -1120,6 +1125,12 @@ Automatically select relevant tools based on user queries to improve response qu
 | `TOOL_SELECTION_THRESHOLD` | integer | `3`     | Min tools before triggering smart selection (use all if below) |
 | `TOOL_SELECTION_LIMIT`     | integer | `3`     | Max tools to select per query to optimize token usage          |
 
+### Admin Log Lookup
+
+| Parameter                  | Type    | Default | Description                                                                                                                                                                                          |
+| -------------------------- | ------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ADMIN_LOG_LOOKUP_ENABLED` | boolean | `true`  | Enables the admin log lookup endpoint, which queries Elasticsearch. Set to `false` for deployments running with `RETRIEVAL_BACKEND=none` (no Elasticsearch), otherwise the endpoint returns HTTP 503 |
+
 ### Code Analysis Services
 
 Integration with advanced code analysis platforms (e.g., AICE).
@@ -1371,6 +1382,7 @@ Read API for per-session coding-agent cost, tooling, repository, and efficiency 
 | `CLI_ANALYTICS_RAW_RETENTION_DAYS`             | integer | `90`                  | Retention period in days for raw telemetry records                                                                                  |
 | `CLI_ANALYTICS_ROLLUP_RETENTION_DAYS`          | integer | `365`                 | Retention period in days for daily and hourly rollups                                                                               |
 | `CLI_ANALYTICS_SESSION_RETENTION_DAYS`         | integer | `0`                   | Retention period in days for whole sessions in session tables; `0` disables session purging                                         |
+| `CLI_ANALYTICS_SESSION_PURGE_BATCH_SIZE`       | integer | `5000`                | Maximum number of idle sessions one session purge statement deletes; a statement also stops at 100,000 child rows                   |
 | `CLI_ANALYTICS_DEDUP_RETENTION_DAYS`           | integer | `14`                  | Retention period in days for duplicate record tracking                                                                              |
 | `CLI_ANALYTICS_ROLLUP_REFRESH_SECONDS`         | integer | `30`                  | Refresh interval in seconds for background rollup calculation                                                                       |
 | `CLI_ANALYTICS_ROLLUP_BATCH_SIZE`              | integer | `5000`                | Number of keys recomputed per transaction during rollup refresh                                                                     |
@@ -1525,3 +1537,4 @@ AUTHORIZED_APPS_ALLOWED_KEY_DOMAINS=["trusted.example","keys.trusted.example"]
 
 - [Kubernetes Deployment](../../deployment/infrastructure-deployment/kubernetes.mdx) - Complete Kubernetes deployment walkthrough for AWS, Azure, and GCP
 - [On-VM Deployment](../../deployment/infrastructure-deployment/on-vm.mdx) - EC2, Azure VM, or Compute Engine deployment with Docker Compose
+- [Running CodeMie Standalone](../../../user-guide/standalone/run-guide.md) - Single-image setup without Elasticsearch or Keycloak
